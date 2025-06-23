@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Mapa Interactivo Mambrino</title>
+    <h1 style="text-align: center;">Luoghi Sferamundi 13/2</h1>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 70%;
+            position: absolute;
+            top: 70px; 
+            left: 250px;
+        }
+        #searchBox {
+            position: absolute;
+            top: 80px; 
+            left: 20px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            width: 200px;
+        }
+        #searchInput {
+            width: 180px;
+            padding: 5px;
+            font-size: 14px;
+        }
+        #markerList {
+            margin-top: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .marker-item {
+            cursor: pointer;
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        .marker-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+    </style>
+</head>
+<body>
+
+<div id="searchBox">
+    <input type="text" id="searchInput" placeholder="Cerca luogo..." />
+    <div id="markerList"></div>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    var map = L.map('map', {
+        crs: L.CRS.Simple,
+        minZoom: -2,
+        maxZoom: 0,
+    });
+
+    var bounds = [[0, 0], [2440, 3900]];
+    var image = L.imageOverlay('https://raw.githubusercontent.com/Patrymigallon/sferamundi/3a933ae36db87042184120f002ddbfab09b6b749/mapa_SferaMundi.jpg', bounds).addTo(map);
+    map.fitBounds(bounds);
+    
+    var points = [
+     { lat: 1179, lng: 1364, name: 'Albania', color: 'green'},
+     { lat: 1122, lng: 2220, name: 'Albarosia', color: 'red'},
+     { lat: 928.5, lng: 2456.5, name: 'Albero delle Fantasme', color: 'red'},
+     { lat: 697, lng: 1809, name: 'Alessandria', color: 'green'},
+     { lat: 1023, lng: 1854, name: 'Antiochia', color: 'green'},
+     { lat: 1179, lng: 1364, name: 'Armenia', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6794/armenia', color: 'green'},
+     { lat: 623.5, lng: 1806.5, name: 'Arsenia', color: 'yellow'},
+     { lat: 944.5, lng: 3140.5, name: 'Arunna', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6815/arunna', color: 'red'},
+     { lat: 638.5, lng: 1991.5, name: 'Ascalone', color: 'green'},
+     { lat: 1246, lng: 2582, name: 'Astra', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/9921/astra', color: 'yellow'},
+     { lat: 1676.5, lng: 785.5, name: 'Averna', color: 'yellow'},
+     { lat: 761, lng: 2727, name: 'Baldacco', color: 'green'},
+     { lat: 2590, lng: 306, name: 'Bellamarina', color: 'yellow'},
+     { lat: 1803, lng: 511, name: 'Biscaglia', color: 'green'},
+     { lat: 1101.5, lng: 1575.5, name: 'Boezia', color: 'green'},
+     { lat: 1683, lng: 957, name: 'Borgogna', color: 'green'},
+     { lat: 1871, lng: 804, name: 'Bretagna', color: 'green'},
+     { lat: 490.5, lng: 3317, name: 'Casa dei Pastori', color: 'red'},
+     { lat: 1033, lng: 2730, name: 'Castello dei giganti Stipone dello Spavento e Camaleone il Temuto', color: 'red'},
+     { lat: 907, lng: 2452.5, name: 'Castello dei Tradimenti', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6802/castello-dei-tradimenti', color: 'red'},
+     { lat: 569.25, lng: 3567.75, name: 'Castello del Forte', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6808/castello-del-forte', color: 'red'},
+     { lat: 456, lng: 3410, name: 'Castello del Sasso', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6790/castello-del-sasso', color: 'red'},
+     { lat: 904.5, lng: 2428.5, name: 'Castello di Alania e Faleria', color: 'red'},
+     { lat: 893.5, lng: 2405.5, name: 'Castello di Corbone', color: 'red'},
+     { lat: 887, lng: 3245, name: 'Castello di Creofanta', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6816/castello-di-creofanta', color: 'red'},
+     { lat: 1001, lng: 2213.5, name: 'Castello di Dragosina', color: 'red'},
+     { lat: 920.5, lng: 3200, name: 'Castello di Miralda la Bella', color: 'red'},
+     { lat: 1017.5, lng: 2263, name: 'Castello di Valerano', color: 'red'},
+     { lat: 1273, lng: 1760, name: 'Costantinopoli', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6756/costantinopoli', color: 'green'},
+     { lat: 541, lng: 1826, name: 'Egitto', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6813/egitto', color: 'green'},
+     { lat: 772, lng: 2179, name: 'Fenicia', color: 'green'},
+     { lat: 555, lng: 3570.5, name: 'Fontana delle Avventure', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6809/fontana-delle-avventure', color: 'red'},
+     { lat: 1700, lng: 896, name: 'Francia', color: 'green'},
+     { lat: 1654, lng: 876, name: 'Ganes', color: 'yellow'},
+     { lat: 1190, lng: 1469, name: 'Grecia', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6760/grecia', color: 'green'},
+     { lat: 156, lng: 3994, name: 'India', color: 'green'},
+     { lat: 1056, lng: 3238, name: 'Ircania', color: 'green'},
+     { lat: 1002, lng: 3331.5, name: 'Laiazza', color: 'yellow'},
+     { lat: 1479, lng: 981.5, name: 'Lavagna', color: 'green'},
+     { lat: 1018, lng: 2834, name: 'Media', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6810/media', color: 'green'},
+     { lat: 1091, lng: 1947.25, name: 'Metropolitana', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6797/metropolitana', color: 'green'},
+     { lat: 1793, lng: 1028, name: 'Messires', color: 'yellow'},
+     { lat: 1013, lng: 2209.5, name: 'Montagna Ardente', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6796/montagna-ardente', color: 'red'},
+     { lat: 1308, lng: 1213.5, name: 'Napoli', color: 'green'},
+     { lat: 1193.5, lng: 1835, name: 'Nichea (Impero e città di)', color: 'green'},
+     { lat: -136, lng: 274, name: 'Oragna', color: 'yellow'},
+     { lat: 1046, lng: 2156, name: 'Palazzo delle Cinque Fortezze', color: 'red'},
+     { lat: 1033, lng: 2149.5, name: 'Palazzo incantato', color: 'red'},
+     { lat: 719, lng: 2031, name: 'Palestina', color: 'green'},
+     { lat: 834, lng: 3234, name: 'Impero dei Parti',  url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6785/impero-dei-parti', color: 'green'},
+     { lat: 612, lng: 2966, name: 'Impero di Persia', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6764/impero-di-persia', color: 'green'},
+     { lat: 1271.75, lng: 1221.25, name: 'Polincastro', color: 'yellow'},
+     { lat: 971, lng: 2885, name: 'Ponte Doloroso', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6811/ponte-doloroso', color: 'red'},
+     { lat: 913.5, lng: 2434.5, name: 'Ponte Proibito', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6805/ponte-proibito', color: 'red'},
+     { lat: 1381, lng: 1101, name: 'Roma', color: 'green'},
+     { lat: 1706, lng: 2842, name: 'Russia', color: 'green'},
+     { lat: 955, lng: 2437, name: 'Sagana', color: 'yellow'},
+     { lat: 980.5, lng: 2155.5, name: 'Sama', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6795/sama', color: 'red'},
+     { lat: 679.5, lng: 2082.5, name: 'Samaria', color: 'green'},
+     { lat: 334, lng: 4618, name: 'Sericana', color: 'green'},
+     { lat: 650, lng: 3646, name: 'Sibilla', color: 'red'},
+     { lat: 1852.5, lng: 1227.5, name: 'Sicambre', color: 'green'},
+     { lat: 1166, lng: 1090, name: 'Sicilia', color: 'green'},
+     { lat: 837.5, lng: 2196, name: 'Siria', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6781/siria', color: 'green'},
+     { lat: 1690, lng: 224, name: 'Spagna', color: 'green'},
+     { lat: 1707, lng: 2297.5, name: 'Tana', color: 'green'},
+     { lat: 1454.5, lng: 2036, name: 'Taurica', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6800/taurica', color: 'green'},
+     { lat: 1380, lng: -32, name: 'Tingiforte', color: 'green'},
+     { lat: 1204.5, lng: 2294.5, name: 'Trabisonda', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6850/trabisonda', color: 'green'},
+     { lat: 802.5, lng: 2098, name: 'Tripoli', color: 'green'},
+     { lat: 772, lng: 3336, name: 'Tuttavilla', color: 'red'},
+     { lat: 698, lng: 2883, name: 'Vorniana', color: 'red'},
+     { lat: 1500, lng: -88, name: 'Zizumarano', color: 'yellow'}
+
+    ];
+
+    var markersLayer = L.layerGroup().addTo(map);
+    var markers = [];
+    var greenIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var redIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var yellowIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+
+points.forEach(function(point) {
+    var popupContent = point.url ? `<a href="${point.url}" target="_blank">${point.name}</a>` : point.name;
+
+    var selectedIcon;
+    if (point.color === 'green') {
+        selectedIcon = greenIcon;
+    } else if (point.color === 'red') {
+        selectedIcon = redIcon;
+    } else if (point.color === 'yellow') {
+        selectedIcon = yellowIcon;
+    } else {
+        selectedIcon = greenIcon;
+    }
+
+    var marker = L.marker([point.lat, point.lng], {icon: selectedIcon}).addTo(markersLayer)
+        .bindPopup(popupContent);
+
+    markers.push({ marker: marker, name: point.name });
+});
+
+
+function displayMarkerList() {
+    var list = document.getElementById('markerList');
+    list.innerHTML = '';
+
+    markers.sort(function(a, b) {
+        return a.name.localeCompare(b.name);
+    });
+
+    markers.forEach(function(item) {
+        var listItem = document.createElement('div');
+        listItem.className = 'marker-item';
+        listItem.textContent = item.name;
+        listItem.addEventListener('click', function() {
+            if (item.isPolygon) {
+                map.fitBounds(item.marker.getBounds());
+                item.marker.openPopup();
+            } else {
+                map.setView(item.marker.getLatLng(), 2);
+                item.marker.openPopup(); 
+            }
+        });
+        list.appendChild(listItem);
+    });
+
+    }
+
+    function searchMarkers(query) {
+        var results = markers.filter(function(item) {
+            return item.name.toLowerCase().includes(query.toLowerCase());
+        });
+
+        updateMarkerList(results);
+    }
+
+    function updateMarkerList(results) {
+        var list = document.getElementById('markerList');
+        list.innerHTML = '';
+
+        results.sort(function(a, b) {
+            return a.name.localeCompare(b.name);
+        });
+
+        results.forEach(function(result) {
+            var listItem = document.createElement('div');
+            listItem.className = 'marker-item';
+            listItem.textContent = result.name;
+            listItem.addEventListener('click', function() {
+                if (result.isPolygon) {
+                    map.fitBounds(result.marker.getBounds());
+                    result.marker.openPopup();
+                } else {
+                    map.setView(result.marker.getLatLng(), 2);
+                    result.marker.openPopup(); 
+                }
+            });
+            list.appendChild(listItem);
+        });
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        var query = e.target.value;
+        searchMarkers(query);
+    });
+
+displayMarkerList();
+
+</script>
+
+
+</body>
+</html>
