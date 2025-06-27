@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Mapa Interactivo Mambrino</title>
+    <h1 style="text-align: center;">Luoghi Sferamundi 13/3</h1>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 70%;
+            position: absolute;
+            top: 70px; 
+            left: 250px;
+        }
+        #searchBox {
+            position: absolute;
+            top: 80px; 
+            left: 20px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            width: 200px;
+        }
+        #searchInput {
+            width: 180px;
+            padding: 5px;
+            font-size: 14px;
+        }
+        #markerList {
+            margin-top: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .marker-item {
+            cursor: pointer;
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        .marker-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+    </style>
+</head>
+<body>
+
+<div id="searchBox">
+    <input type="text" id="searchInput" placeholder="Cerca luogo..." />
+    <div id="markerList"></div>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    var map = L.map('map', {
+        crs: L.CRS.Simple,
+        minZoom: -2,
+        maxZoom: 0,
+    });
+
+    var bounds = [[0, 0], [2440, 3900]];
+    var image = L.imageOverlay('https://raw.githubusercontent.com/Patrymigallon/sferamundi/3a933ae36db87042184120f002ddbfab09b6b749/mapa_SferaMundi.jpg', bounds).addTo(map);
+    map.fitBounds(bounds);
+    
+    var points = [
+    { lat: 1634, lng: 2734, name: 'Amazzoni', color: 'green'},
+    { lat: 1055, lng: 2252, name: 'Armenia', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6794/armenia', color: 'green'},
+    { lat: 1898, lng: 1092, name: 'Contea di Artois', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6762/contea-di-artois', color: 'green'},
+    { lat: 714, lng: 2672, name: 'Regno degli Assiri', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6834/regno-degli-assiri', color: 'green'},
+    { lat: 1246, lng: 2582, name: 'Astra', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/9921/astra', color: 'yellow'},
+    { lat: 1106, lng: 1554, name: 'Boezia', color: 'green'},
+    { lat: 1849, lng: 1255, name: 'Bransuich', color: 'green'},
+    { lat: 1182.5, lng: 2125.5, name: 'Capadocia', color: 'green'},
+    { lat: 1429, lng: 2099, name: 'Carinea / Isola dei Crudeli / Isola degli Elestrigoni', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6836/carinea', color: 'red'},
+    { lat: 1940, lng: 1126, name: 'Castello di Gabbadeo', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6841/castello-di-gabbadeo', color: 'red'},
+    { lat: 532, lng: 4368, name: 'Castello di Miralda', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6830/castello-di-miralda', color: 'red'},
+    { lat: 1844, lng: 1113, name: 'Colonia', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6843/colonia', color: 'green'},
+    { lat: 1700, lng: 896, name: 'Francia', color: 'green'},
+    { lat: 919, lng: 1742.5, name: 'Galdapa', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6772/regno-di-galdapa', color: 'yellow'},
+    { lat: 1472, lng: 74, name: 'Galerda', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6826/galerda', color: 'red'},
+    { lat: 1868, lng: 733, name: 'Gaula', color: 'green'},
+    { lat: 1190, lng: 1469, name: 'Grecia', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6760/grecia', color: 'green'},
+    { lat: 142, lng: 4382, name: 'India Maggiore', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6832/india-maggiore', color: 'yellow'},
+    { lat: 1004, lng: 1581, name: 'Isola d´Idra (Sidera, Sidra)', color: 'yellow'},
+    { lat: 98, lng: 5154, name: 'Isola Felice', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6838/isola-felice', color: 'yellow'},
+    { lat: 462, lng: 5590, name: 'Isole delle Indie Orientali', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6825/indie-orientali', color: 'yellow'},
+    { lat: 1384, lng: 1116, name: 'Italia', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6820/italia', color:'green'},
+    { lat: 1858, lng: 1336, name: 'Lamagna',  url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6792/regno-di-lamagna', color: 'green'},
+    { lat: 1958, lng: 1122.5, name: 'Mare delle Fiandre', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6761/mar-delle-fiandre', color: 'green'},
+    { lat: 786, lng: 3334, name: 'Monastero di Santa Gioconda', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6835/monastero-di-santa-gioconda', color: 'red'},
+    { lat: 1013, lng: 2209.5, name: 'Montagna Ardente', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6796/montagna-ardente', color: 'red'},
+    { lat: 1896, lng: 1058, name: 'Montagna Incantata', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6842/montagna-incantata', color: 'red'},
+    { lat: 598, lng: 1110, name: 'Numidia', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6774/numidia', color: 'green'},
+    { lat: 750, lng: 1442, name: 'Palomaro', color: 'red'},
+    { lat: 834, lng: 3234, name: 'Impero dei Parti',  url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6785/impero-dei-parti', color: 'green'},
+    { lat: 612, lng: 2966, name: 'Impero di Persia', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6764/impero-di-persia', color: 'green'},
+    { lat: 722, lng: 1508, name: 'Rocca di Amore', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6848/rocca-di-amore', color: 'red'},
+    { lat: 909, lng: 1766, name: 'Rodas', color: 'green'},
+    { lat: 1381, lng: 1101, name: 'Roma', color: 'green'},
+    { lat: 650, lng: 3646, name: 'Sibilla', color: 'red'},
+    { lat: 1492, lng: 92, name: 'Silanchia', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6823/silanchia', color: 'red'},
+    { lat: 969, lng: 1493, name: 'Sparta', color: 'green'},
+    { lat: 1546, lng: 14, name: 'Stretto di Gibilterra', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6821/gibilterra', color: 'green'},
+    { lat: 1168, lng: 1106, name: 'Tanacria', color: 'green'},
+    { lat: 1454.5, lng: 2036, name: 'Taurica', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6800/taurica', color: 'green'},
+    { lat: 1214, lng: 196, name: 'Tremisene', url: 'https://mambrino.mappingchivalry.dlls.univr.it/place/6819/tremisene', color: 'green'},
+    { lat: 726, lng: 1462, name: 'Valle di Amore / L´Amorosa Valle', color: 'red'},
+    { lat: 1423, lng: 2103, name: 'Villa', color: 'red'}
+
+    ];
+
+    var markersLayer = L.layerGroup().addTo(map);
+    var markers = [];
+    var greenIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var redIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var yellowIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+
+points.forEach(function(point) {
+    var popupContent = point.url ? `<a href="${point.url}" target="_blank">${point.name}</a>` : point.name;
+
+    var selectedIcon;
+    if (point.color === 'green') {
+        selectedIcon = greenIcon;
+    } else if (point.color === 'red') {
+        selectedIcon = redIcon;
+    } else if (point.color === 'yellow') {
+        selectedIcon = yellowIcon;
+    } else {
+        selectedIcon = greenIcon;
+    }
+
+    var marker = L.marker([point.lat, point.lng], {icon: selectedIcon}).addTo(markersLayer)
+        .bindPopup(popupContent);
+
+    markers.push({ marker: marker, name: point.name });
+});
+
+
+function displayMarkerList() {
+    var list = document.getElementById('markerList');
+    list.innerHTML = '';
+
+    markers.sort(function(a, b) {
+        return a.name.localeCompare(b.name);
+    });
+
+    markers.forEach(function(item) {
+        var listItem = document.createElement('div');
+        listItem.className = 'marker-item';
+        listItem.textContent = item.name;
+        listItem.addEventListener('click', function() {
+            if (item.isPolygon) {
+                map.fitBounds(item.marker.getBounds());
+                item.marker.openPopup();
+            } else {
+                map.setView(item.marker.getLatLng(), 2);
+                item.marker.openPopup(); 
+            }
+        });
+        list.appendChild(listItem);
+    });
+
+    }
+
+    function searchMarkers(query) {
+        var results = markers.filter(function(item) {
+            return item.name.toLowerCase().includes(query.toLowerCase());
+        });
+
+        updateMarkerList(results);
+    }
+
+    function updateMarkerList(results) {
+        var list = document.getElementById('markerList');
+        list.innerHTML = '';
+
+        results.sort(function(a, b) {
+            return a.name.localeCompare(b.name);
+        });
+
+        results.forEach(function(result) {
+            var listItem = document.createElement('div');
+            listItem.className = 'marker-item';
+            listItem.textContent = result.name;
+            listItem.addEventListener('click', function() {
+                if (result.isPolygon) {
+                    map.fitBounds(result.marker.getBounds());
+                    result.marker.openPopup();
+                } else {
+                    map.setView(result.marker.getLatLng(), 2);
+                    result.marker.openPopup(); 
+                }
+            });
+            list.appendChild(listItem);
+        });
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        var query = e.target.value;
+        searchMarkers(query);
+    });
+
+displayMarkerList();
+
+</script>
+
+
+</body>
+</html>
